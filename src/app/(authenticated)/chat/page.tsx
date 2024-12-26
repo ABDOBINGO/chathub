@@ -278,20 +278,15 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      {/* Welcome Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Welcome to ChatHub! 👋
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          This is a global chat room where you can communicate with other users. Here's how to use it:
+      {/* Compact Welcome Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-2 text-sm">
+        <div className="flex items-center gap-2 text-gray-900 dark:text-white mb-1">
+          <span className="font-semibold">Welcome to ChatHub</span>
+          <span className="text-lg">👋</span>
+        </div>
+        <p className="text-gray-500 dark:text-gray-400 text-xs">
+          Send messages, voice notes, and toggle auto-refresh in the top-right corner
         </p>
-        <ul className="list-disc list-inside mt-2 text-gray-600 dark:text-gray-400 space-y-1">
-          <li>Type your message in the input box below and press Enter or click Send</li>
-          <li>Messages will automatically refresh every 0.5 seconds</li>
-          <li>You can toggle auto-refresh using the button in the top-right corner</li>
-          <li>Click the trash icon on your own messages to delete them</li>
-        </ul>
       </div>
 
       {/* Messages Section */}
