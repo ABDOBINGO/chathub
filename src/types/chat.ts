@@ -6,6 +6,11 @@ export interface Message {
   voice_url?: string
   is_pinned?: boolean
   is_edited?: boolean
+  reactions: {
+    emoji: string
+    count: number
+    user_has_reacted: boolean
+  }[]
   profiles?: {
     full_name: string | null
     avatar_url: string | null
