@@ -140,19 +140,30 @@ export default function ChatPage() {
         }
       })
 
+      // Try different formats for maximum compatibility
+      let mimeType = 'audio/mp4';
       let recorder;
+
+      // Test different formats
+      if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+        mimeType = 'audio/webm';
+      }
+
       try {
-        recorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm;codecs=opus'
-        })
+        recorder = new MediaRecorder(stream, { mimeType })
       } catch (e) {
+        // Fallback to default
         recorder = new MediaRecorder(stream)
       }
 
       const chunks: BlobPart[] = []
       recorder.ondataavailable = (e) => chunks.push(e.data)
       recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: recorder.mimeType })
+        const audioBlob = new Blob(chunks, { type: mimeType })
         await handleVoiceUpload(audioBlob)
       }
 
@@ -332,8 +343,14 @@ export default function ChatPage() {
                       className="relative"
                     >
                       {message.voice_url ? (
-                        <audio controls className="max-w-[240px]">
+                        <audio 
+                          controls 
+                          className="max-w-[240px]"
+                          preload="none"
+                        >
+                          <source src={message.voice_url} type="audio/mp4" />
                           <source src={message.voice_url} type="audio/webm" />
+                          <source src={message.voice_url} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>
                       ) : (
