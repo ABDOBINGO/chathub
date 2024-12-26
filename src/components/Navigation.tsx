@@ -20,6 +20,8 @@ export default function Navigation() {
   }, [user])
 
   const fetchProfile = async () => {
+    if (!user) return
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
