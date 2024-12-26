@@ -92,7 +92,7 @@ export default function SearchPage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{profile.email}</p>
                 </div>
               </div>
-              {profile.id !== user.id && (
+              {user && profile.id !== user.id && (
                 <Link
                   href={`/chat/private?user=${profile.id}`}
                   className="flex items-center space-x-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
