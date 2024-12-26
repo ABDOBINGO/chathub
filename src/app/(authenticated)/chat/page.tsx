@@ -237,7 +237,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Welcome Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -340,8 +340,8 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Message Input - Fixed at bottom for mobile */}
-      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+      {/* Message Input - Fixed at bottom with padding for navigation */}
+      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"

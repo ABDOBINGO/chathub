@@ -217,7 +217,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
+    <div className="max-w-4xl mx-auto px-4 py-4 md:py-8 mb-20">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         {/* Tabs - Scrollable on mobile */}
         <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
@@ -586,12 +586,13 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Save Button */}
-          <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+          {/* Save Button - Fixed at bottom */}
+          <div className="sticky bottom-20 left-0 right-0 bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 mt-6">
             <button
               type="submit"
               disabled={loading}
-              className="w-full md:w-auto bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: profile.primary_color }}
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
