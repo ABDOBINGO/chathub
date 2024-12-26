@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 
-export default function AuthenticatedPage() {
+export const dynamic = 'force-static'
+
+export default async function AuthenticatedPage() {
   redirect('/chat')
 } 
