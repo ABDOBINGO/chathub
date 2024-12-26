@@ -6,6 +6,7 @@
   NEXT_USE_NETLIFY_EDGE = "true"
   NEXT_PRIVATE_TARGET = "server"
   NODE_VERSION = "18"
+  PYTHON_VERSION = "3.9"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
