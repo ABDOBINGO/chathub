@@ -5,10 +5,11 @@ export interface Message {
   created_at: string
   voice_url?: string
   is_pinned?: boolean
+  is_edited?: boolean
   profiles?: {
-    full_name: string
-    avatar_url: string
-    email: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string | null
   }
 }
 

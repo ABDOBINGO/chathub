@@ -53,12 +53,12 @@ export default function Message({
     >
       <div className="flex items-start">
         <div className="h-9 w-9 rounded-full bg-gray-400 flex items-center justify-center text-white">
-          {message.profiles?.email?.[0].toUpperCase() || 'U'}
+          {message.profiles?.email?.[0]?.toUpperCase() || 'U'}
         </div>
         <div className="ml-3 flex-1">
           <div className="flex items-center">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {message.profiles?.email || 'Unknown User'}
+              {message.profiles?.full_name || message.profiles?.email?.split('@')[0] || 'Unknown User'}
             </p>
             <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
               {format(new Date(message.created_at), 'MMM d, h:mm a')}
