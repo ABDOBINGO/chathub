@@ -78,6 +78,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   const loadSettings = async () => {
+    if (!user?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
