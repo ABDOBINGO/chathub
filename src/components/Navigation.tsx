@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FiMessageSquare, FiUsers, FiMail, FiUser, FiSearch, FiLogOut } from 'react-icons/fi'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { User } from '@supabase/supabase-js'
 
 interface Profile {
   id: string
@@ -53,22 +54,25 @@ export default function Navigation() {
     { href: '/profile', label: 'Profile', icon: FiUser },
   ]
 
+  const userEmail = user?.email || ''
+  const displayName = profile?.full_name || userEmail.split('@')[0]
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:top-0 md:left-0 md:bottom-0 md:w-64 md:border-r md:border-t-0">
       <div className="flex flex-row md:flex-col items-center md:items-stretch h-16 md:h-screen p-4">
         {/* User Avatar - Only visible on desktop */}
         <div className="hidden md:flex items-center space-x-3 w-full mb-8 mt-4">
           <img
-            src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || user.email)}`}
+            src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`}
             alt="Profile"
             className="w-10 h-10 rounded-full"
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-              {profile?.full_name || user.email.split('@')[0]}
+              {displayName}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {user.email}
+              {userEmail}
             </p>
           </div>
         </div>
