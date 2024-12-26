@@ -132,24 +132,56 @@ export default function ChatPage() {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+      // Request permissions with iOS-compatible constraints
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100,
+        }
       })
+
+      // For iOS Safari compatibility
+      const options = {
+        mimeType: 'audio/webm;codecs=opus',
+        audioBitsPerSecond: 128000
+      }
+
+      let recorder;
+      try {
+        recorder = new MediaRecorder(stream, options)
+      } catch (e) {
+        // Fallback for iOS Safari
+        recorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' })
+      }
+
       const chunks: BlobPart[] = []
 
       recorder.ondataavailable = (e) => chunks.push(e.data)
       recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/webm' })
+        const audioBlob = new Blob(chunks, { type: recorder.mimeType })
         await handleVoiceUpload(audioBlob)
       }
 
       recorder.start()
       setMediaRecorder(recorder)
       setIsRecording(true)
+
+      // Add visual feedback
+      toast.success('Recording started', {
+        icon: '🎤',
+        duration: 1000
+      })
     } catch (error) {
       console.error('Error starting recording:', error)
-      toast.error('Failed to start recording')
+      if (error instanceof DOMException && error.name === 'NotAllowedError') {
+        toast.error('Please allow microphone access to record voice messages')
+      } else if (error instanceof DOMException && error.name === 'NotFoundError') {
+        toast.error('No microphone found')
+      } else {
+        toast.error('Failed to start recording')
+      }
     }
   }
 
@@ -158,6 +190,12 @@ export default function ChatPage() {
       mediaRecorder.stop()
       setIsRecording(false)
       mediaRecorder.stream.getTracks().forEach(track => track.stop())
+      
+      // Add visual feedback
+      toast.success('Recording stopped', {
+        icon: '🎤',
+        duration: 1000
+      })
     }
   }
 
@@ -167,14 +205,16 @@ export default function ChatPage() {
     setLoading(true)
     try {
       const timestamp = Date.now()
-      const fileName = `voice-${timestamp}.webm`
+      // Use .m4a extension for iOS Safari compatibility
+      const extension = audioBlob.type.includes('mp4') ? 'm4a' : 'webm'
+      const fileName = `voice-${timestamp}.${extension}`
       const filePath = `${user.id}/${fileName}`
 
       // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('voice-messages')
         .upload(filePath, audioBlob, {
-          contentType: 'audio/webm'
+          contentType: audioBlob.type
         })
 
       if (uploadError) throw uploadError
