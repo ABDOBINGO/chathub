@@ -36,6 +36,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClientComponentClient()
   const [autoRefresh, setAutoRefresh] = useState(true)
+  const [touchTimer, setTouchTimer] = useState<NodeJS.Timeout | null>(null)
+  const [touchStarted, setTouchStarted] = useState(false)
 
   const fetchMessages = async () => {
     try {
@@ -276,6 +278,44 @@ export default function ChatPage() {
     return style
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault() // Prevent default to avoid unwanted behaviors
+    if (touchStarted || isRecording) return // Prevent multiple starts
+
+    setTouchStarted(true)
+    const timer = setTimeout(() => {
+      startRecording()
+    }, 200) // Small delay to ensure it's a hold
+    setTouchTimer(timer)
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
+    setTouchStarted(false)
+    
+    if (touchTimer) {
+      clearTimeout(touchTimer)
+      setTouchTimer(null)
+    }
+
+    if (isRecording) {
+      stopRecording()
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault()
+    // If user moves finger too much, cancel recording
+    if (touchTimer) {
+      clearTimeout(touchTimer)
+      setTouchTimer(null)
+    }
+    if (isRecording) {
+      stopRecording()
+    }
+    setTouchStarted(false)
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Compact Welcome Section */}
@@ -380,17 +420,21 @@ export default function ChatPage() {
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"
-            onMouseDown={startRecording}
-            onMouseUp={stopRecording}
-            onMouseLeave={stopRecording}
-            onTouchStart={startRecording}
-            onTouchEnd={stopRecording}
-            className={`p-3 rounded-full transition-colors ${
-              isRecording ? 'bg-red-500 recording-pulse' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
+            onTouchCancel={handleTouchEnd}
+            className={`p-3 rounded-full transition-colors relative ${
+              isRecording ? 'bg-red-500 recording-pulse' : touchStarted ? 'bg-gray-300 dark:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
             }`}
             title="Hold to record voice message"
           >
             <FiMic className={`w-6 h-6 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
+            {touchStarted && !isRecording && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-full">
+                <div className="w-full h-full animate-ping bg-gray-400 rounded-full opacity-75"></div>
+              </div>
+            )}
           </button>
 
           <input
