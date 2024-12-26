@@ -4,6 +4,7 @@ export interface Message {
   user_id: string
   created_at: string
   voice_url?: string
+  is_pinned?: boolean
   profiles?: {
     full_name: string
     avatar_url: string
