@@ -342,7 +342,20 @@ export default function ChatPage() {
 
       {/* Message Input */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
+        <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+          <button
+            type="button"
+            onMouseDown={startRecording}
+            onMouseUp={stopRecording}
+            onMouseLeave={stopRecording}
+            className={`p-3 rounded-full transition-colors ${
+              isRecording ? 'bg-red-500 recording-pulse' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            }`}
+            title="Hold to record voice message"
+          >
+            <FiMic className={`w-5 h-5 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
+          </button>
+
           <input
             type="text"
             value={newMessage}
@@ -368,21 +381,6 @@ export default function ChatPage() {
             <FiSend className="w-5 h-5" />
           </button>
         </form>
-
-        <div className="flex items-center space-x-2 mt-2">
-          <button
-            type="button"
-            onMouseDown={startRecording}
-            onMouseUp={stopRecording}
-            onMouseLeave={stopRecording}
-            className={`p-2 rounded-full transition-colors ${
-              isRecording ? 'bg-red-500 recording-pulse' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-            }`}
-            title="Hold to record voice message"
-          >
-            <FiMic className={`w-5 h-5 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
-          </button>
-        </div>
       </div>
     </div>
   )
