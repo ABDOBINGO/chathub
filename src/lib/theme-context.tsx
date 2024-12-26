@@ -128,6 +128,32 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  useEffect(() => {
+    if (!user) return
+    
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('theme, bubble_style, primary_color, message_alignment, enable_sounds, show_timestamps, show_read_receipts, enable_notifications')
+          .eq('id', user.id)
+          .single()
+
+        if (error) throw error
+        if (data) {
+          setSettings({
+            ...defaultSettings,
+            ...data
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching theme settings:', error)
+      }
+    }
+
+    fetchSettings()
+  }, [user])
+
   return (
     <ThemeContext.Provider value={{ settings, updateSettings }}>
       {children}
