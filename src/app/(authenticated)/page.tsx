@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
-export default function AuthenticatedPage() {
-  redirect('/chat')
+export default async function AuthenticatedPage() {
+  return redirect('/chat')
 } 
