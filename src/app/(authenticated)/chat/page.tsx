@@ -340,20 +340,22 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Message Input */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+      {/* Message Input - Fixed at bottom for mobile */}
+      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"
             onMouseDown={startRecording}
             onMouseUp={stopRecording}
             onMouseLeave={stopRecording}
+            onTouchStart={startRecording}
+            onTouchEnd={stopRecording}
             className={`p-3 rounded-full transition-colors ${
               isRecording ? 'bg-red-500 recording-pulse' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
             }`}
             title="Hold to record voice message"
           >
-            <FiMic className={`w-5 h-5 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
+            <FiMic className={`w-6 h-6 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
           </button>
 
           <input
@@ -361,7 +363,7 @@ export default function ChatPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2"
             style={{ 
               '--tw-ring-color': settings.primary_color,
               '--tw-ring-opacity': '1'
@@ -371,14 +373,14 @@ export default function ChatPage() {
           <button
             type="submit"
             disabled={loading || !newMessage.trim()}
-            className="text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             style={{ 
               backgroundColor: settings.primary_color,
               '--tw-ring-color': settings.primary_color,
               '--tw-ring-opacity': '1'
             } as React.CSSProperties}
           >
-            <FiSend className="w-5 h-5" />
+            <FiSend className="w-6 h-6" />
           </button>
         </form>
       </div>

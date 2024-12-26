@@ -217,58 +217,58 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-        {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="flex space-x-8 px-6" aria-label="Tabs">
+        {/* Tabs - Scrollable on mobile */}
+        <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+          <nav className="flex whitespace-nowrap px-4 md:px-6" aria-label="Tabs">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`py-4 px-1 inline-flex items-center gap-2 border-b-2 ${
+              className={`py-3 md:py-4 px-3 md:px-4 inline-flex items-center gap-2 border-b-2 ${
                 activeTab === 'profile'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <FiUser />
-              Profile
+              <FiUser className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-sm md:text-base">Profile</span>
             </button>
             <button
               onClick={() => setActiveTab('appearance')}
-              className={`py-4 px-1 inline-flex items-center gap-2 border-b-2 ${
+              className={`py-3 md:py-4 px-3 md:px-4 inline-flex items-center gap-2 border-b-2 ${
                 activeTab === 'appearance'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <FiLayout />
-              Appearance
+              <FiLayout className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-sm md:text-base">Appearance</span>
             </button>
             <button
               onClick={() => setActiveTab('preferences')}
-              className={`py-4 px-1 inline-flex items-center gap-2 border-b-2 ${
+              className={`py-3 md:py-4 px-3 md:px-4 inline-flex items-center gap-2 border-b-2 ${
                 activeTab === 'preferences'
                   ? 'border-primary-500 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <FiSettings />
-              Preferences
+              <FiSettings className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-sm md:text-base">Preferences</span>
             </button>
           </nav>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
                 <img
                   src={profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.full_name || user?.email || '')}`}
                   alt={profile.full_name || 'Avatar'}
-                  className="w-20 h-20 rounded-full object-cover"
+                  className="w-24 h-24 md:w-20 md:h-20 rounded-full object-cover mx-auto md:mx-0 mb-4 md:mb-0"
                 />
-                <label className="relative cursor-pointer">
+                <label className="flex justify-center md:justify-start">
                   <span className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
                     Change Avatar
                   </span>
@@ -282,29 +282,30 @@ export default function ProfilePage() {
                 </label>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={profile.full_name}
-                  onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="Enter your full name"
-                />
-              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={user?.email || ''}
-                  className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-white"
-                  disabled
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-white"
+                    disabled
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -312,82 +313,89 @@ export default function ProfilePage() {
           {/* Appearance Tab */}
           {activeTab === 'appearance' && (
             <div className="space-y-6">
+              {/* Theme Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Theme
                 </label>
-                <div className="flex space-x-4">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => setProfile({ ...profile, theme: 'light' })}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+                    className={`flex-1 md:flex-none flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border ${
                       profile.theme === 'light'
                         ? 'border-primary-500 text-primary-600 bg-primary-50'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <FiSun className="w-5 h-5" />
+                    <FiSun className="w-4 h-4 md:w-5 md:h-5" />
                     <span>Light</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setProfile({ ...profile, theme: 'dark' })}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+                    className={`flex-1 md:flex-none flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border ${
                       profile.theme === 'dark'
                         ? 'border-primary-500 text-primary-600 bg-primary-50'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <FiMoon className="w-5 h-5" />
+                    <FiMoon className="w-4 h-4 md:w-5 md:h-5" />
                     <span>Dark</span>
                   </button>
                 </div>
               </div>
 
+              {/* Color Picker */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Primary Color
                 </label>
-                <input
-                  type="color"
-                  value={profile.primary_color}
-                  onChange={(e) => setProfile({ ...profile, primary_color: e.target.value })}
-                  className="h-10 w-20"
-                />
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="color"
+                    value={profile.primary_color}
+                    onChange={(e) => setProfile({ ...profile, primary_color: e.target.value })}
+                    className="h-10 w-20"
+                  />
+                  <span className="text-sm text-gray-500">{profile.primary_color}</span>
+                </div>
               </div>
 
+              {/* Bubble Styles */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Message Bubble Style
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
                   {bubbleStyles.map((style) => (
                     <button
                       key={style.id}
                       type="button"
                       onClick={() => setProfile({ ...profile, bubble_style: style.id })}
-                      className={`p-4 text-center border rounded-lg ${
+                      className={`p-3 md:p-4 text-center border rounded-lg ${
                         profile.bubble_style === style.id
                           ? 'border-primary-500 text-primary-600 bg-primary-50'
                           : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                       }`}
                     >
-                      <div className="text-2xl mb-2">{style.preview}</div>
-                      <div className="text-sm">{style.name}</div>
+                      <div className="text-xl md:text-2xl mb-1 md:mb-2">{style.preview}</div>
+                      <div className="text-xs md:text-sm">{style.name}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Message Alignment */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Message Alignment
                 </label>
-                <div className="flex space-x-4">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => setProfile({ ...profile, message_alignment: 'left' })}
-                    className={`px-4 py-2 rounded-lg border ${
+                    className={`flex-1 md:flex-none px-4 py-2 rounded-lg border ${
                       profile.message_alignment === 'left'
                         ? 'border-primary-500 text-primary-600 bg-primary-50'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -398,7 +406,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => setProfile({ ...profile, message_alignment: 'right' })}
-                    className={`px-4 py-2 rounded-lg border ${
+                    className={`flex-1 md:flex-none px-4 py-2 rounded-lg border ${
                       profile.message_alignment === 'right'
                         ? 'border-primary-500 text-primary-600 bg-primary-50'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -444,19 +452,17 @@ export default function ProfilePage() {
                     <label className="block text-sm text-gray-600 dark:text-gray-300 mb-2">
                       Apply Appearance Code
                     </label>
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        placeholder="Paste appearance code here"
-                        onChange={(e) => {
-                          if (e.target.value.trim()) {
-                            applyAppearanceCode(e.target.value.trim())
-                            e.target.value = ''
-                          }
-                        }}
-                        className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 ring-primary-500"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      placeholder="Paste appearance code here"
+                      onChange={(e) => {
+                        if (e.target.value.trim()) {
+                          applyAppearanceCode(e.target.value.trim())
+                          e.target.value = ''
+                        }
+                      }}
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 ring-primary-500"
+                    />
                   </div>
                 </div>
               </div>
@@ -580,11 +586,12 @@ export default function ProfilePage() {
             </div>
           )}
 
+          {/* Save Button */}
           <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="submit"
               disabled={loading}
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
