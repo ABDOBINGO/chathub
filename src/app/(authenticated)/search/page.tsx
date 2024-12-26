@@ -1,44 +1,38 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/lib/auth-context'
+import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { FiSearch, FiMail } from 'react-icons/fi'
-import toast from 'react-hot-toast'
-import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
+import { Message } from '@/types/chat'
+
+interface SearchResult {
+  id: string
+  full_name: string
+  avatar_url: string
+  email: string
+}
 
 export default function SearchPage() {
-  const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState([])
   const supabase = createClientComponentClient()
+  const { user } = useAuth()
 
   const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      setResults([])
-      return
-    }
-
+    if (!searchTerm.trim()) return
     setLoading(true)
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .or(`email.ilike.%${searchTerm}%,full_name.ilike.%${searchTerm}%`)
+        .ilike('full_name', `%${searchTerm}%`)
         .order('full_name')
-        .limit(20)
 
-      if (error) {
-        console.error('Search error:', error)
-        throw error
-      }
-
-      console.log('Search results:', data) // Debug log
+      if (error) throw error
       setResults(data || [])
     } catch (error) {
       console.error('Error searching profiles:', error)
-      toast.error('Failed to search users')
     } finally {
       setLoading(false)
     }
