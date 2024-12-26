@@ -18,6 +18,15 @@ export interface Message {
   }
 }
 
+export interface ChatUser {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  last_seen?: string
+  online?: boolean
+}
+
 export interface MessageStyle {
   className: string
   style: {
