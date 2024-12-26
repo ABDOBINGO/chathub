@@ -3,6 +3,7 @@ export interface Message {
   content: string
   user_id: string
   created_at: string
+  updated_at?: string
   voice_url?: string
   is_pinned?: boolean
   is_edited?: boolean
