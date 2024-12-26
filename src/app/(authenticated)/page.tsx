@@ -1,21 +1,21 @@
-import type { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Redirecting...',
-}
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-export const dynamic = 'force-static'
-export const revalidate = 0
+export default function AuthenticatedPage() {
+  const router = useRouter()
 
-export default async function AuthenticatedPage() {
+  useEffect(() => {
+    router.replace('/chat')
+  }, [router])
+
   return (
-    <>
-      <meta httpEquiv="refresh" content="0;url=/chat" />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.location.href = "/chat"`
-        }}
-      />
-    </>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold mb-2">Redirecting...</h1>
+        <p className="text-gray-600">Taking you to the chat page</p>
+      </div>
+    </div>
   )
 } 
