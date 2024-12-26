@@ -36,8 +36,6 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClientComponentClient()
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [touchTimer, setTouchTimer] = useState<NodeJS.Timeout | null>(null)
-  const [touchStarted, setTouchStarted] = useState(false)
 
   const fetchMessages = async () => {
     try {
@@ -134,32 +132,24 @@ export default function ChatPage() {
 
   const startRecording = async () => {
     try {
-      // Request permissions with iOS-compatible constraints
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 44100,
         }
       })
 
-      // For iOS Safari compatibility
-      const options = {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 128000
-      }
-
       let recorder;
       try {
-        recorder = new MediaRecorder(stream, options)
+        recorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus'
+        })
       } catch (e) {
-        // Fallback for iOS Safari
-        recorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' })
+        recorder = new MediaRecorder(stream)
       }
 
       const chunks: BlobPart[] = []
-
       recorder.ondataavailable = (e) => chunks.push(e.data)
       recorder.onstop = async () => {
         const audioBlob = new Blob(chunks, { type: recorder.mimeType })
@@ -169,18 +159,11 @@ export default function ChatPage() {
       recorder.start()
       setMediaRecorder(recorder)
       setIsRecording(true)
-
-      // Add visual feedback
-      toast.success('Recording started', {
-        icon: '🎤',
-        duration: 1000
-      })
+      toast.success('Recording started')
     } catch (error) {
       console.error('Error starting recording:', error)
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
-        toast.error('Please allow microphone access to record voice messages')
-      } else if (error instanceof DOMException && error.name === 'NotFoundError') {
-        toast.error('No microphone found')
+        toast.error('Please allow microphone access')
       } else {
         toast.error('Failed to start recording')
       }
@@ -192,12 +175,15 @@ export default function ChatPage() {
       mediaRecorder.stop()
       setIsRecording(false)
       mediaRecorder.stream.getTracks().forEach(track => track.stop())
-      
-      // Add visual feedback
-      toast.success('Recording stopped', {
-        icon: '🎤',
-        duration: 1000
-      })
+      toast.success('Recording stopped')
+    }
+  }
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording()
+    } else {
+      startRecording()
     }
   }
 
@@ -276,44 +262,6 @@ export default function ChatPage() {
     }
 
     return style
-  }
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault() // Prevent default to avoid unwanted behaviors
-    if (touchStarted || isRecording) return // Prevent multiple starts
-
-    setTouchStarted(true)
-    const timer = setTimeout(() => {
-      startRecording()
-    }, 200) // Small delay to ensure it's a hold
-    setTouchTimer(timer)
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.preventDefault()
-    setTouchStarted(false)
-    
-    if (touchTimer) {
-      clearTimeout(touchTimer)
-      setTouchTimer(null)
-    }
-
-    if (isRecording) {
-      stopRecording()
-    }
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault()
-    // If user moves finger too much, cancel recording
-    if (touchTimer) {
-      clearTimeout(touchTimer)
-      setTouchTimer(null)
-    }
-    if (isRecording) {
-      stopRecording()
-    }
-    setTouchStarted(false)
   }
 
   return (
@@ -420,20 +368,18 @@ export default function ChatPage() {
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchMove={handleTouchMove}
-            onTouchCancel={handleTouchEnd}
-            className={`p-3 rounded-full transition-colors relative ${
-              isRecording ? 'bg-red-500 recording-pulse' : touchStarted ? 'bg-gray-300 dark:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            onClick={toggleRecording}
+            className={`p-3 rounded-full transition-colors ${
+              isRecording 
+                ? 'bg-red-500 animate-pulse' 
+                : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
             }`}
-            title="Hold to record voice message"
+            title={isRecording ? "Click to stop recording" : "Click to start recording"}
           >
-            <FiMic className={`w-6 h-6 ${isRecording ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
-            {touchStarted && !isRecording && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-full">
-                <div className="w-full h-full animate-ping bg-gray-400 rounded-full opacity-75"></div>
-              </div>
+            {isRecording ? (
+              <FiSquare className="w-6 h-6 text-white" />
+            ) : (
+              <FiMic className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             )}
           </button>
 
