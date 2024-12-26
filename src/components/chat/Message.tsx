@@ -57,7 +57,9 @@ export default function Message({
         </div>
         <div className="ml-3 flex-1">
           <div className="flex items-center">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">{message.user_email}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white">
+              {message.profiles?.email || 'Unknown User'}
+            </p>
             <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
               {format(new Date(message.created_at), 'MMM d, h:mm a')}
             </span>
