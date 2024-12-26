@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAuth } from '@/lib/auth-context'
-import { Message } from '@/types/chat'
+import { FiSearch, FiMail } from 'react-icons/fi'
+import Link from 'next/link'
 
 interface SearchResult {
   id: string
