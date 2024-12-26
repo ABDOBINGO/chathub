@@ -7,10 +7,11 @@ import { FiSend, FiTrash2, FiRefreshCw, FiPause, FiPlay, FiMic } from 'react-ico
 import toast from 'react-hot-toast'
 import { useTheme } from '@/lib/theme-context'
 import { soundManager } from '@/lib/sounds'
+import { Message, MessageStyle } from '@/types/chat'
 
 export default function HomePage() {
   const { user } = useAuth()
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
@@ -21,7 +22,7 @@ export default function HomePage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const { settings } = useTheme()
 
-  const getMessageStyle = (isOwnMessage: boolean) => {
+  const getMessageStyle = (isOwnMessage: boolean): MessageStyle => {
     const baseStyle = 'relative group p-3'
     const alignmentStyle = isOwnMessage ? 'ml-auto' : ''
     
@@ -54,20 +55,24 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    fetchMessages()
-    const interval = setInterval(() => {
-      if (autoRefresh) {
-        fetchMessages()
-      }
-    }, 500)
-    return () => clearInterval(interval)
-  }, [autoRefresh])
+    if (user) {
+      fetchMessages()
+      const interval = setInterval(() => {
+        if (autoRefresh) {
+          fetchMessages()
+        }
+      }, 500)
+      return () => clearInterval(interval)
+    }
+  }, [autoRefresh, user])
 
   useEffect(() => {
     scrollToBottom()
   }, [messages])
 
   const fetchMessages = async () => {
+    if (!user) return
+    
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -87,9 +92,9 @@ export default function HomePage() {
     }
   }
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newMessage.trim()) return
+    if (!newMessage.trim() || !user) return
 
     setLoading(true)
     try {
@@ -117,7 +122,7 @@ export default function HomePage() {
     }
   }
 
-  const handleDeleteMessage = async (messageId) => {
+  const handleDeleteMessage = async (messageId: string) => {
     try {
       const { error } = await supabase
         .from('messages')
@@ -287,6 +292,7 @@ export default function HomePage() {
               className={`flex ${settings.message_alignment === 'right' ? 'justify-end' : 'justify-start'}`}
             >
               <div className="max-w-[80%]">
+                {user && (
                 <div {...getMessageStyle(message.user_id === user.id)}>
                   {message.voice_url ? (
                     <audio controls className="w-full max-w-[200px]">
@@ -310,6 +316,7 @@ export default function HomePage() {
                     </button>
                   )}
                 </div>
+                )}
               </div>
             </div>
           ))}
