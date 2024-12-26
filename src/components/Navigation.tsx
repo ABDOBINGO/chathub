@@ -7,10 +7,16 @@ import { usePathname } from 'next/navigation'
 import { FiMessageSquare, FiUsers, FiMail, FiUser, FiSearch, FiLogOut } from 'react-icons/fi'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
+interface Profile {
+  id: string
+  full_name: string | null
+  avatar_url: string | null
+}
+
 export default function Navigation() {
   const { user, signOut } = useAuth()
   const pathname = usePathname()
-  const [profile, setProfile] = useState(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
