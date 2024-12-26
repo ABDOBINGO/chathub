@@ -11,6 +11,7 @@ interface Profile {
   id: string
   full_name: string | null
   avatar_url: string | null
+  email: string | null
 }
 
 export default function Navigation() {
@@ -36,7 +37,7 @@ export default function Navigation() {
         .single()
 
       if (error) throw error
-      setProfile(data)
+      setProfile(data as Profile)
     } catch (error) {
       console.error('Error fetching profile:', error)
     }
