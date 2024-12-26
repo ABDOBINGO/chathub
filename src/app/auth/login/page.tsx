@@ -1,15 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import toast from 'react-hot-toast'
 import { useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const { signIn, signInWithGoogle, signInWithGithub, loading } = useAuth()
+function SearchParamsHandler() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
@@ -23,6 +20,14 @@ export default function LoginPage() {
       toast.success(message)
     }
   }, [searchParams])
+
+  return null
+}
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const { signIn, signInWithGoogle, signInWithGithub, loading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,6 +56,9 @@ export default function LoginPage() {
 
   return (
     <>
+      <Suspense>
+        <SearchParamsHandler />
+      </Suspense>
       <div className="text-center">
         <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
           Sign in to your account
