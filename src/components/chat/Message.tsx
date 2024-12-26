@@ -53,7 +53,7 @@ export default function Message({
     >
       <div className="flex items-start">
         <div className="h-9 w-9 rounded-full bg-gray-400 flex items-center justify-center text-white">
-          {message.user_email[0].toUpperCase()}
+          {message.profiles?.email?.[0].toUpperCase() || 'U'}
         </div>
         <div className="ml-3 flex-1">
           <div className="flex items-center">

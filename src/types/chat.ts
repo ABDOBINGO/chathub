@@ -8,6 +8,7 @@ export interface Message {
   profiles?: {
     full_name: string
     avatar_url: string
+    email: string
   }
 }
 
