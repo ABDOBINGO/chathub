@@ -276,26 +276,23 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
-      {/* Compact Welcome Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-2 text-sm">
-        <div className="flex items-center gap-2 text-gray-900 dark:text-white mb-1">
-          <span className="font-semibold">Welcome to ChatHub</span>
-          <span className="text-lg">👋</span>
-        </div>
-        <p className="text-gray-500 dark:text-gray-400 text-xs">
-          Send messages, voice notes, and toggle auto-refresh in the top-right corner
-        </p>
-      </div>
-
-      {/* Messages Section */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Messages</h2>
+    <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
+      {/* Welcome Section - Enhanced for mobile */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 mt-14 md:mt-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-gray-900 dark:text-white">
+              <span className="font-semibold text-base md:text-lg">Welcome to ChatHub</span>
+              <span className="text-xl">👋</span>
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm mt-1">
+              Send messages, voice notes, and toggle auto-refresh in the top-right corner
+            </p>
+          </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors`}
+              className={`flex items-center space-x-1 px-2 md:px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-colors`}
               style={{
                 backgroundColor: autoRefresh ? `${settings.primary_color}20` : 'var(--bg-secondary)',
                 color: autoRefresh ? settings.primary_color : 'var(--text-secondary)'
@@ -303,13 +300,13 @@ export default function ChatPage() {
             >
               {autoRefresh ? (
                 <>
-                  <FiPause className="w-4 h-4" />
-                  <span>Pause Updates</span>
+                  <FiPause className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="hidden md:inline">Pause Updates</span>
                 </>
               ) : (
                 <>
-                  <FiPlay className="w-4 h-4" />
-                  <span>Resume Updates</span>
+                  <FiPlay className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="hidden md:inline">Resume Updates</span>
                 </>
               )}
             </button>
@@ -318,26 +315,29 @@ export default function ChatPage() {
               className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               title="Refresh messages"
             >
-              <FiRefreshCw className="w-4 h-4" />
+              <FiRefreshCw className="w-3 h-3 md:w-4 md:h-4" />
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-4">
+      {/* Messages Section - Enhanced for mobile */}
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 mb-3 md:mb-4 overflow-y-auto">
+        <div className="space-y-3 md:space-y-4">
           {messages.map((message) => (
             <div key={message.id} className="group">
               <div
                 className={`flex items-start space-x-2 md:space-x-3 ${
-                  message.user_id === user?.id ? 'flex-row-reverse space-x-reverse' : ''
+                  message.user_id === user?.id ? 'flex-row-reverse space-x-reverse md:space-x-reverse' : ''
                 }`}
               >
                 <img
                   src={message.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(message.profiles?.full_name || 'User')}`}
                   alt={message.profiles?.full_name || 'User'}
-                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-full flex-shrink-0"
                 />
-                <div className={`flex flex-col max-w-[75%] ${message.user_id === user?.id ? 'items-end' : ''}`}>
-                  <div className="flex items-center gap-2">
+                <div className={`flex flex-col max-w-[80%] md:max-w-[75%] ${message.user_id === user?.id ? 'items-end' : ''}`}>
+                  <div className="flex items-center gap-1 md:gap-2">
                     <div
                       style={getMessageStyle(message.user_id === user?.id)}
                       className="relative"
@@ -345,7 +345,7 @@ export default function ChatPage() {
                       {message.voice_url ? (
                         <audio 
                           controls 
-                          className="max-w-[240px]"
+                          className="max-w-[200px] md:max-w-[240px]"
                           preload="none"
                         >
                           <source src={message.voice_url} type="audio/mp4" />
@@ -357,7 +357,7 @@ export default function ChatPage() {
                         <p className="break-words text-sm md:text-base">{message.content}</p>
                       )}
                       {settings.show_timestamps && (
-                        <p className="text-xs opacity-75 mt-1">
+                        <p className="text-[10px] md:text-xs opacity-75 mt-1">
                           {new Date(message.created_at).toLocaleTimeString()}
                         </p>
                       )}
@@ -365,10 +365,10 @@ export default function ChatPage() {
                     {message.user_id === user?.id && (
                       <button
                         onClick={() => handleDelete(message.id)}
-                        className="p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1 md:p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Delete message"
                       >
-                        <FiTrash2 className="w-4 h-4" />
+                        <FiTrash2 className="w-3 h-3 md:w-4 md:h-4" />
                       </button>
                     )}
                   </div>
@@ -380,13 +380,13 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Message Input - Fixed at bottom with padding for navigation */}
-      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+      {/* Message Input - Enhanced for mobile */}
+      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4">
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"
             onClick={toggleRecording}
-            className={`p-3 rounded-full transition-colors ${
+            className={`p-2 md:p-3 rounded-full transition-colors ${
               isRecording 
                 ? 'bg-red-500 animate-pulse' 
                 : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
@@ -394,9 +394,9 @@ export default function ChatPage() {
             title={isRecording ? "Click to stop recording" : "Click to start recording"}
           >
             {isRecording ? (
-              <FiSquare className="w-6 h-6 text-white" />
+              <FiSquare className="w-5 h-5 md:w-6 md:h-6 text-white" />
             ) : (
-              <FiMic className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <FiMic className="w-5 h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" />
             )}
           </button>
 
@@ -405,7 +405,7 @@ export default function ChatPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2"
+            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2"
             style={{ 
               '--tw-ring-color': settings.primary_color,
               '--tw-ring-opacity': '1'
@@ -415,14 +415,14 @@ export default function ChatPage() {
           <button
             type="submit"
             disabled={loading || !newMessage.trim()}
-            className="text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="text-white p-2 md:p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             style={{ 
               backgroundColor: settings.primary_color,
               '--tw-ring-color': settings.primary_color,
               '--tw-ring-opacity': '1'
             } as React.CSSProperties}
           >
-            <FiSend className="w-6 h-6" />
+            <FiSend className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </form>
       </div>
