@@ -8,7 +8,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { FiSend, FiTrash2, FiMic, FiSquare, FiRefreshCw, FiPause, FiPlay } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { soundManager } from '@/lib/sounds'
-import { applyAppearance } from '@/utils/appearance'
+import { applyAppearance, loadAppearance } from '@/utils/appearance'
 
 interface Settings {
   theme: 'light' | 'dark'
@@ -286,6 +286,10 @@ export default function ChatPage() {
   const handleAppearanceCode = (code: string) => {
     try {
       if (applyAppearance(code)) {
+        const savedSettings = loadAppearance()
+        if (savedSettings) {
+          setSettings(savedSettings)
+        }
         toast.success('Appearance settings applied successfully!')
       } else {
         toast.error('Invalid appearance code')
