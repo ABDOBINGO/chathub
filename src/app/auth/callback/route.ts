@@ -1,23 +1,21 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/chat'
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
-    try {
-      await supabase.auth.exchangeCodeForSession(code)
-      return NextResponse.redirect(requestUrl.origin)
-    } catch (error: any) {
-      console.error('Auth callback error:', error)
-      return NextResponse.redirect(
-        `${requestUrl.origin}/auth/login?error=${encodeURIComponent(error.message || 'An error occurred during authentication.')}`
-      )
-    }
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    
+    // Exchange the code for a session
+    await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(requestUrl.origin)
+  // URL to redirect to after sign in process completes
+  return NextResponse.redirect(new URL(next, requestUrl.origin))
 } 
