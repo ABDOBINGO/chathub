@@ -7,17 +7,29 @@ import { useEffect } from 'react'
 import { initAppearance, loadAppearance } from '@/utils/appearance'
 import './globals.css'
 
+const defaultSettings = {
+  theme: 'light',
+  bubble_style: 'modern',
+  primary_color: '#6366F1',
+  message_alignment: 'right',
+  show_timestamps: true
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   useEffect(() => {
-    initAppearance()
+    // Initialize with default settings if none exist
+    const savedSettings = loadAppearance()
+    if (!savedSettings) {
+      initAppearance()
+    }
     
     // Apply theme from saved settings
-    const savedSettings = loadAppearance()
-    if (savedSettings?.theme === 'dark') {
+    const settings = savedSettings || defaultSettings
+    if (settings.theme === 'dark') {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')

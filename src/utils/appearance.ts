@@ -3,6 +3,7 @@ interface AppearanceSettings {
   bubble_style: 'modern' | 'rounded' | 'classic' | 'minimal';
   primary_color: string;
   message_alignment: 'left' | 'right';
+  show_timestamps: boolean;
 }
 
 const APPEARANCE_KEY = 'chathub_appearance'

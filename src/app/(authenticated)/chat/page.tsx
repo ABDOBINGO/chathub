@@ -14,6 +14,7 @@ interface Settings {
   bubble_style: 'modern' | 'rounded' | 'classic' | 'minimal'
   primary_color: string
   message_alignment: 'left' | 'right'
+  show_timestamps: boolean
 }
 
 type Profile = {
@@ -45,7 +46,8 @@ export default function ChatPage() {
     theme: 'light',
     bubble_style: 'modern',
     primary_color: '#6366F1',
-    message_alignment: 'right'
+    message_alignment: 'right',
+    show_timestamps: true
   })
 
   const { user } = useAuth()
@@ -320,7 +322,8 @@ export default function ChatPage() {
           theme: savedSettings.theme,
           bubble_style: savedSettings.bubble_style,
           primary_color: savedSettings.primary_color,
-          message_alignment: savedSettings.message_alignment
+          message_alignment: savedSettings.message_alignment,
+          show_timestamps: savedSettings.show_timestamps
         })
       }
     }
