@@ -49,6 +49,7 @@ export default function SignUpPage() {
 
       if (error) throw error
 
+      // Sign in immediately after signup
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,

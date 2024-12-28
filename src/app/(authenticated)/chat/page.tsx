@@ -3,19 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAuth } from '@/lib/auth-context'
+import { useTheme } from '@/lib/theme-context'
 import { formatDistanceToNow } from 'date-fns'
 import { FiSend, FiTrash2, FiMic, FiSquare, FiRefreshCw, FiPause, FiPlay } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { soundManager } from '@/lib/sounds'
-import { applyAppearance, loadAppearance } from '@/utils/appearance'
-
-interface Settings {
-  theme: 'light' | 'dark'
-  bubble_style: 'modern' | 'rounded' | 'classic' | 'minimal'
-  primary_color: string
-  message_alignment: 'left' | 'right'
-  show_timestamps: boolean
-}
 
 type Profile = {
   id: string
@@ -34,30 +26,16 @@ type Message = {
 }
 
 export default function ChatPage() {
+  const { user } = useAuth()
+  const { settings } = useTheme()
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [autoRefresh, setAutoRefresh] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
-  const [recordingTime, setRecordingTime] = useState(0)
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [settings, setSettings] = useState<Settings>({
-    theme: 'light',
-    bubble_style: 'modern',
-    primary_color: '#6366F1',
-    message_alignment: 'right',
-    show_timestamps: true
-  })
-
-  const { user } = useAuth()
-  const supabase = createClientComponentClient()
-  const mediaRecorder = useRef<MediaRecorder | null>(null)
-  const audioChunks = useRef<Blob[]>([])
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const supabase = createClientComponentClient()
+  const [autoRefresh, setAutoRefresh] = useState(true)
 
   const fetchMessages = async () => {
     try {
@@ -190,7 +168,7 @@ export default function ChatPage() {
       }
 
       recorder.start()
-      mediaRecorder.current = recorder
+      setMediaRecorder(recorder)
       setIsRecording(true)
       toast.success('Recording started')
     } catch (error) {
@@ -204,10 +182,10 @@ export default function ChatPage() {
   }
 
   const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
-      mediaRecorder.current.stop()
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop()
       setIsRecording(false)
-      mediaRecorder.current.stream.getTracks().forEach(track => track.stop())
+      mediaRecorder.stream.getTracks().forEach(track => track.stop())
       toast.success('Recording stopped')
     }
   }
@@ -296,39 +274,6 @@ export default function ChatPage() {
 
     return style
   }
-
-  const handleAppearanceCode = (code: string) => {
-    try {
-      if (applyAppearance(code)) {
-        const savedSettings = loadAppearance()
-        if (savedSettings) {
-          setSettings(savedSettings)
-        }
-        toast.success('Appearance settings applied successfully!')
-      } else {
-        toast.error('Invalid appearance code')
-      }
-    } catch (error) {
-      console.error('Error applying appearance:', error)
-      toast.error('Failed to apply appearance settings')
-    }
-  }
-
-  useEffect(() => {
-    const loadSettings = () => {
-      const savedSettings = loadAppearance()
-      if (savedSettings) {
-        setSettings({
-          theme: savedSettings.theme,
-          bubble_style: savedSettings.bubble_style,
-          primary_color: savedSettings.primary_color,
-          message_alignment: savedSettings.message_alignment,
-          show_timestamps: savedSettings.show_timestamps
-        })
-      }
-    }
-    loadSettings()
-  }, [])
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">

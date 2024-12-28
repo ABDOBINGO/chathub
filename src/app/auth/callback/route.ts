@@ -10,18 +10,6 @@ export async function GET(request: NextRequest) {
     const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
     const next = requestUrl.searchParams.get('next') || '/chat'
-    const error = requestUrl.searchParams.get('error')
-    const error_description = requestUrl.searchParams.get('error_description')
-
-    // If there's an error, redirect with the error
-    if (error) {
-      return NextResponse.redirect(
-        new URL(
-          `/auth/login?error=${encodeURIComponent(error_description || 'An error occurred')}`,
-          requestUrl.origin
-        )
-      )
-    }
 
     if (code) {
       const cookieStore = cookies()
@@ -37,7 +25,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(next, requestUrl.origin))
     }
 
-    // If no code and no error, redirect to login
+    // If no code, redirect to login
     return NextResponse.redirect(new URL('/auth/login', requestUrl.origin))
   } catch (error: any) {
     console.error('Auth callback error:', error)

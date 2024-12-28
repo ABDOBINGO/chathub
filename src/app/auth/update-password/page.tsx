@@ -35,17 +35,7 @@ function UpdatePasswordContent() {
         return
       }
     }
-
-    // Verify session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        toast.error('Please request a new password reset link')
-        router.push('/auth/forgot-password')
-      }
-    }
-    checkSession()
-  }, [searchParams, router, supabase.auth])
+  }, [searchParams, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
