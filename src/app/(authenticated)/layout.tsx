@@ -1,15 +1,12 @@
 'use client'
 
 import Navigation from '@/components/Navigation'
+import { AuthProvider } from '@/lib/auth-context'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-export default function AuthenticatedLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function AuthenticatedContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const router = useRouter()
 
@@ -34,5 +31,19 @@ export default function AuthenticatedLayout({
         {children}
       </main>
     </div>
+  )
+}
+
+export default function AuthenticatedLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <AuthProvider>
+      <AuthenticatedContent>
+        {children}
+      </AuthenticatedContent>
+    </AuthProvider>
   )
 } 
