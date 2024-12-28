@@ -34,16 +34,30 @@ type Message = {
 }
 
 export default function ChatPage() {
-  const { user } = useAuth()
-  const { settings } = useTheme()
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [autoRefresh, setAutoRefresh] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [settings, setSettings] = useState<Settings>({
+    theme: 'light',
+    bubble_style: 'modern',
+    primary_color: '#6366F1',
+    message_alignment: 'right'
+  })
+
+  const { user } = useAuth()
+  const { theme } = useTheme()
   const supabase = createClientComponentClient()
-  const [autoRefresh, setAutoRefresh] = useState(true)
+  const mediaRecorder = useRef<MediaRecorder | null>(null)
+  const audioChunks = useRef<Blob[]>([])
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const fetchMessages = async () => {
     try {
@@ -176,7 +190,7 @@ export default function ChatPage() {
       }
 
       recorder.start()
-      setMediaRecorder(recorder)
+      mediaRecorder.current = recorder
       setIsRecording(true)
       toast.success('Recording started')
     } catch (error) {
@@ -190,10 +204,10 @@ export default function ChatPage() {
   }
 
   const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop()
+    if (mediaRecorder.current && isRecording) {
+      mediaRecorder.current.stop()
       setIsRecording(false)
-      mediaRecorder.stream.getTracks().forEach(track => track.stop())
+      mediaRecorder.current.stream.getTracks().forEach(track => track.stop())
       toast.success('Recording stopped')
     }
   }
