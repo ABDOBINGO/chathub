@@ -1,45 +1,16 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 
-function UpdatePasswordContent() {
+export default function UpdatePasswordPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClientComponentClient()
-
-  useEffect(() => {
-    const error = searchParams.get('error_description')
-    if (error) {
-      toast.error(error)
-      router.push('/auth/login')
-    }
-  }, [searchParams, router])
-
-  useEffect(() => {
-    const setupSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        // Get the hash fragment
-        const hash = window.location.hash
-        if (hash) {
-          // Parse the hash fragment
-          const params = new URLSearchParams(hash.substring(1))
-          const error = params.get('error_description')
-          if (error) {
-            toast.error(error)
-            router.push('/auth/login')
-          }
-        }
-      }
-    }
-    setupSession()
-  }, [router, supabase.auth])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -141,17 +112,5 @@ function UpdatePasswordContent() {
         </form>
       </div>
     </div>
-  )
-}
-
-export default function UpdatePasswordPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <UpdatePasswordContent />
-    </Suspense>
   )
 } 
