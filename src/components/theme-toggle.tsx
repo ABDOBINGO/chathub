@@ -3,15 +3,15 @@
 import { useTheme } from '@/lib/theme-context'
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { settings, updateSettings } = useTheme()
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })}
       className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
       aria-label="Toggle theme"
     >
-      {theme === 'dark' ? (
+      {settings.theme === 'dark' ? (
         <svg
           className="w-5 h-5 text-gray-800 dark:text-gray-200"
           fill="none"
