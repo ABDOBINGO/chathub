@@ -40,6 +40,7 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const lastScrollPositionRef = useRef(0)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>()
   const supabase = createClientComponentClient()
 
   // Function to check if user is near bottom
@@ -60,14 +61,25 @@ export default function ChatPage() {
     
     // Check if user is scrolling up
     setIsScrolling(true)
-    clearTimeout(window.scrollTimeout)
-    window.scrollTimeout = setTimeout(() => setIsScrolling(false), 150)
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current)
+    }
+    scrollTimeoutRef.current = setTimeout(() => setIsScrolling(false), 150)
 
     // Reset new messages indicator if scrolled to bottom
     if (isNearBottom()) {
       setHasNewMessages(false)
     }
   }
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+    }
+  }, [])
 
   // Improved scroll to bottom
   const scrollToBottom = (force = false) => {
