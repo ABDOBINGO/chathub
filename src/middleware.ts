@@ -10,19 +10,7 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Handle password reset flow
-  if (request.nextUrl.pathname === '/') {
-    const requestUrl = new URL(request.url)
-    const token = requestUrl.searchParams.get('token')
-    const type = requestUrl.searchParams.get('type')
-
-    if (token && type === 'recovery') {
-      // Redirect to update password page with the token
-      return NextResponse.redirect(new URL('/auth/update-password', request.url))
-    }
-  }
-
-  // Protected routes
+  // If user is not logged in and trying to access protected routes
   if (
     !session &&
     (request.nextUrl.pathname.startsWith('/chat') ||
@@ -32,13 +20,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Auth routes when already logged in
+  // If user is logged in and trying to access auth routes
   if (
     session &&
     (request.nextUrl.pathname.startsWith('/auth/login') ||
       request.nextUrl.pathname.startsWith('/auth/signup'))
   ) {
     return NextResponse.redirect(new URL('/chat', request.url))
+  }
+
+  // If user is logged in and accessing root, redirect to chat
+  if (session && request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/chat', request.url))
+  }
+
+  // If user is not logged in and accessing root, allow access
+  if (!session && request.nextUrl.pathname === '/') {
+    return res
   }
 
   return res
