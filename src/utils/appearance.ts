@@ -1,8 +1,8 @@
 interface AppearanceSettings {
   theme: 'light' | 'dark';
-  bubbleStyle: 'rounded' | 'square';
-  primaryColor: string;
-  messageAlignment: 'left' | 'right';
+  bubble_style: 'modern' | 'rounded' | 'classic' | 'minimal';
+  primary_color: string;
+  message_alignment: 'left' | 'right';
 }
 
 const APPEARANCE_KEY = 'chathub_appearance'
@@ -40,13 +40,13 @@ export function applyAppearance(code: string): boolean {
     }
 
     // Apply primary color
-    document.documentElement.style.setProperty('--primary-color', settings.primaryColor)
+    document.documentElement.style.setProperty('--primary-color', settings.primary_color)
 
     // Apply bubble style
-    document.documentElement.setAttribute('data-bubble-style', settings.bubbleStyle)
+    document.documentElement.setAttribute('data-bubble-style', settings.bubble_style)
 
     // Apply message alignment
-    document.documentElement.setAttribute('data-message-align', settings.messageAlignment)
+    document.documentElement.setAttribute('data-message-align', settings.message_alignment)
 
     return true
   } catch (e) {

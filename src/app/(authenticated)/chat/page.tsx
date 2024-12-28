@@ -8,6 +8,14 @@ import { formatDistanceToNow } from 'date-fns'
 import { FiSend, FiTrash2, FiMic, FiSquare, FiRefreshCw, FiPause, FiPlay } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { soundManager } from '@/lib/sounds'
+import { applyAppearance } from '@/utils/appearance'
+
+interface Settings {
+  theme: 'light' | 'dark'
+  bubble_style: 'modern' | 'rounded' | 'classic' | 'minimal'
+  primary_color: string
+  message_alignment: 'left' | 'right'
+}
 
 type Profile = {
   id: string
@@ -287,6 +295,21 @@ export default function ChatPage() {
       toast.error('Failed to apply appearance settings')
     }
   }
+
+  useEffect(() => {
+    const loadSettings = () => {
+      const savedSettings = loadAppearance()
+      if (savedSettings) {
+        setSettings({
+          theme: savedSettings.theme,
+          bubble_style: savedSettings.bubble_style,
+          primary_color: savedSettings.primary_color,
+          message_alignment: savedSettings.message_alignment
+        })
+      }
+    }
+    loadSettings()
+  }, [])
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
