@@ -6,6 +6,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
 import { ThemeToggle } from '../../components/theme-toggle'
 import { useAuth } from '@/lib/auth-context'
+import { FiMenu, FiX } from 'react-icons/fi'
 
 export default function AuthenticatedLayout({
   children,
@@ -16,6 +17,8 @@ export default function AuthenticatedLayout({
   const router = useRouter()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [profile, setProfile] = useState<{ avatar_url?: string; full_name?: string } | null>(null)
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
@@ -27,6 +30,25 @@ export default function AuthenticatedLayout({
     }
     checkSession()
   }, [router, supabase.auth])
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('avatar_url, full_name')
+          .eq('id', user.id)
+          .single()
+
+        if (error) throw error
+        setProfile(data)
+      } catch (error) {
+        console.error('Error fetching profile:', error)
+      }
+    }
+    fetchProfile()
+  }, [user, supabase])
 
   const handleSignOut = async () => {
     setLoading(true)
@@ -42,8 +64,20 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setSidebarOpen(!isSidebarOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
+      >
+        {isSidebarOpen ? (
+          <FiX className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+        ) : (
+          <FiMenu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+        )}
+      </button>
+
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30">
+      <div className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-transform duration-300 ease-in-out`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <span className="text-xl font-bold text-gray-800 dark:text-white">ChatHub</span>
@@ -178,11 +212,19 @@ export default function AuthenticatedLayout({
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white">
-                  {user?.email?.[0].toUpperCase()}
-                </div>
-                <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user?.email}
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.full_name || user?.email || 'Avatar'}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white">
+                    {user?.email?.[0].toUpperCase()}
+                  </div>
+                )}
+                <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+                  {profile?.full_name || user?.email}
                 </span>
               </div>
             </div>
@@ -215,6 +257,14 @@ export default function AuthenticatedLayout({
           </div>
         </div>
       </div>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main content */}
       <main className="flex-1 md:ml-64 p-4 overflow-auto">
