@@ -321,8 +321,8 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Messages Section - Enhanced for mobile */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 mb-3 md:mb-4 overflow-y-auto">
+      {/* Messages Section */}
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 mb-3 md:mb-4 overflow-y-auto pb-32">
         <div className="space-y-3 md:space-y-4">
           {messages.map((message) => (
             <div key={message.id} className="group">
@@ -380,58 +380,51 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Message Input and Mic Button */}
-      <div className="fixed bottom-16 left-0 right-0 flex flex-col gap-2 px-3 md:px-4">
-        {/* Chat Input */}
-        <form onSubmit={handleSubmit} className="relative flex items-center w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-l-lg px-4 py-2 md:py-3 text-base focus:outline-none focus:ring-2"
-            style={{ 
-              '--tw-ring-color': settings.primary_color,
-              '--tw-ring-opacity': '1',
-              fontSize: '16px'
-            } as React.CSSProperties}
-            disabled={loading}
-            autoComplete="off"
-          />
+      {/* Message Input - Fixed at bottom */}
+      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 p-2">
           <button
-            type="submit"
-            disabled={loading || !newMessage.trim()}
-            className="px-4 py-2 md:py-3 text-white rounded-r-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            style={{ 
-              backgroundColor: settings.primary_color,
-              '--tw-ring-color': settings.primary_color,
-              '--tw-ring-opacity': '1'
-            } as React.CSSProperties}
+            type="button"
+            onClick={toggleRecording}
+            className={`p-3 rounded-full transition-colors flex-shrink-0 ${
+              isRecording 
+                ? 'bg-red-500 animate-pulse' 
+                : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            }`}
+            title={isRecording ? "Click to stop recording" : "Click to start recording"}
           >
-            <FiSend className="w-5 h-5 md:w-6 md:h-6" />
+            {isRecording ? (
+              <FiSquare className="w-5 h-5 text-white" />
+            ) : (
+              <FiMic className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            )}
           </button>
-        </form>
 
-        {/* Mic Button */}
-        <button
-          type="button"
-          onClick={toggleRecording}
-          className={`absolute right-3 md:right-4 bottom-0 p-3 rounded-full shadow-lg transition-colors ${
-            isRecording 
-              ? 'bg-red-500 animate-pulse' 
-              : 'bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700'
-          }`}
-          style={{ 
-            backgroundColor: isRecording ? undefined : settings.primary_color
-          }}
-          title={isRecording ? "Click to stop recording" : "Click to start recording"}
-        >
-          {isRecording ? (
-            <FiSquare className="w-6 h-6 text-white" />
-          ) : (
-            <FiMic className="w-6 h-6 text-white" />
-          )}
-        </button>
+          <div className="flex-1 flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 bg-transparent text-gray-900 dark:text-white px-4 py-2 text-base focus:outline-none"
+              style={{ 
+                fontSize: '16px'
+              }}
+              disabled={loading}
+              autoComplete="off"
+            />
+            <button
+              type="submit"
+              disabled={loading || !newMessage.trim()}
+              className="p-2 text-white rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors mx-1"
+              style={{ 
+                backgroundColor: settings.primary_color
+              }}
+            >
+              <FiSend className="w-5 h-5" />
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
