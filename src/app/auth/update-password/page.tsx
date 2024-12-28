@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import toast from 'react-hot-toast'
 
 export default function UpdatePasswordPage() {
@@ -10,7 +10,40 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    // Check for error in URL parameters
+    const error = searchParams.get('error_description')
+    if (error) {
+      toast.error(error)
+      router.push('/auth/forgot-password')
+      return
+    }
+
+    // Check for error in URL hash
+    const hash = window.location.hash
+    if (hash) {
+      const hashParams = new URLSearchParams(hash.substring(1))
+      const hashError = hashParams.get('error_description')
+      if (hashError) {
+        toast.error(hashError)
+        router.push('/auth/forgot-password')
+        return
+      }
+    }
+
+    // Verify session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast.error('Please request a new password reset link')
+        router.push('/auth/forgot-password')
+      }
+    }
+    checkSession()
+  }, [searchParams, router, supabase.auth])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
