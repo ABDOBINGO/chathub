@@ -380,32 +380,16 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4">
-        <form onSubmit={handleSubmit} className="relative flex items-center space-x-2">
-          <button
-            type="button"
-            onClick={toggleRecording}
-            className={`absolute left-0 p-2 md:p-3 rounded-full transition-colors ${
-              isRecording 
-                ? 'bg-red-500 animate-pulse' 
-                : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-            }`}
-            title={isRecording ? "Click to stop recording" : "Click to start recording"}
-          >
-            {isRecording ? (
-              <FiSquare className="w-5 h-5 md:w-6 md:h-6 text-white" />
-            ) : (
-              <FiMic className="w-5 h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" />
-            )}
-          </button>
-
+      {/* Message Input and Mic Button */}
+      <div className="fixed bottom-16 left-0 right-0 flex flex-col gap-2 px-3 md:px-4">
+        {/* Chat Input */}
+        <form onSubmit={handleSubmit} className="relative flex items-center w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg pl-12 pr-12 py-2 md:py-3 text-base md:text-base focus:outline-none focus:ring-2"
+            className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-l-lg px-4 py-2 md:py-3 text-base focus:outline-none focus:ring-2"
             style={{ 
               '--tw-ring-color': settings.primary_color,
               '--tw-ring-opacity': '1',
@@ -417,7 +401,7 @@ export default function ChatPage() {
           <button
             type="submit"
             disabled={loading || !newMessage.trim()}
-            className="absolute right-0 text-white p-2 md:p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 md:py-3 text-white rounded-r-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             style={{ 
               backgroundColor: settings.primary_color,
               '--tw-ring-color': settings.primary_color,
@@ -427,6 +411,27 @@ export default function ChatPage() {
             <FiSend className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </form>
+
+        {/* Mic Button */}
+        <button
+          type="button"
+          onClick={toggleRecording}
+          className={`absolute right-3 md:right-4 bottom-0 p-3 rounded-full shadow-lg transition-colors ${
+            isRecording 
+              ? 'bg-red-500 animate-pulse' 
+              : 'bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700'
+          }`}
+          style={{ 
+            backgroundColor: isRecording ? undefined : settings.primary_color
+          }}
+          title={isRecording ? "Click to stop recording" : "Click to start recording"}
+        >
+          {isRecording ? (
+            <FiSquare className="w-6 h-6 text-white" />
+          ) : (
+            <FiMic className="w-6 h-6 text-white" />
+          )}
+        </button>
       </div>
     </div>
   )
