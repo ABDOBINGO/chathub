@@ -33,10 +33,55 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const supabase = createClientComponentClient()
   const [autoRefresh, setAutoRefresh] = useState(true)
+  const [isScrolling, setIsScrolling] = useState(false)
+  const [hasNewMessages, setHasNewMessages] = useState(false)
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const lastScrollPositionRef = useRef(0)
+  const supabase = createClientComponentClient()
 
+  // Function to check if user is near bottom
+  const isNearBottom = () => {
+    if (!messagesContainerRef.current) return true
+    const container = messagesContainerRef.current
+    const threshold = 100 // pixels from bottom
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold
+  }
+
+  // Improved scroll handling
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return
+    const container = messagesContainerRef.current
+    
+    // Update scroll position
+    lastScrollPositionRef.current = container.scrollTop
+    
+    // Check if user is scrolling up
+    setIsScrolling(true)
+    clearTimeout(window.scrollTimeout)
+    window.scrollTimeout = setTimeout(() => setIsScrolling(false), 150)
+
+    // Reset new messages indicator if scrolled to bottom
+    if (isNearBottom()) {
+      setHasNewMessages(false)
+    }
+  }
+
+  // Improved scroll to bottom
+  const scrollToBottom = (force = false) => {
+    if (!messagesEndRef.current || !messagesContainerRef.current) return
+    
+    const shouldScroll = force || isNearBottom()
+    if (shouldScroll) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    } else if (!isScrolling) {
+      setHasNewMessages(true)
+    }
+  }
+
+  // Fetch messages with improved error handling
   const fetchMessages = async () => {
     try {
       const { data, error } = await supabase
@@ -45,6 +90,7 @@ export default function ChatPage() {
         .order('created_at', { ascending: true })
 
       if (error) throw error
+      
       setMessages(data as Message[] || [])
       scrollToBottom()
     } catch (error) {
@@ -53,11 +99,10 @@ export default function ChatPage() {
     }
   }
 
+  // Set up real-time updates and auto-refresh
   useEffect(() => {
-    // Initial fetch
     fetchMessages()
 
-    // Set up real-time subscription
     const channel = supabase
       .channel('messages')
       .on(
@@ -68,27 +113,26 @@ export default function ChatPage() {
           table: 'messages',
         },
         () => {
-          fetchMessages()
+          if (autoRefresh) {
+            fetchMessages()
+          }
         }
       )
       .subscribe()
 
-    // Set up auto-refresh every 500ms for real-time updates
-    const refreshInterval = setInterval(fetchMessages, 500)
+    // Auto-refresh setup
+    let refreshInterval: NodeJS.Timeout | null = null
+    if (autoRefresh) {
+      refreshInterval = setInterval(fetchMessages, 5000)
+    }
 
-    // Cleanup function
     return () => {
       channel.unsubscribe()
-      clearInterval(refreshInterval)
+      if (refreshInterval) clearInterval(refreshInterval)
     }
-  }, []) // Empty dependency array to run only once on mount
+  }, [autoRefresh])
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
+  // Handle message submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newMessage.trim() || !user) return
@@ -106,6 +150,13 @@ export default function ChatPage() {
         }])
 
       if (error) throw error
+      
+      // Play sound if enabled
+      if (settings.enable_sounds) {
+        soundManager.play('message-sent')
+      }
+      
+      scrollToBottom(true)
     } catch (error) {
       console.error('Error sending message:', error)
       toast.error('Failed to send message')
@@ -115,6 +166,7 @@ export default function ChatPage() {
     }
   }
 
+  // Handle message deletion
   const handleDelete = async (messageId: string) => {
     try {
       const { error } = await supabase
@@ -130,6 +182,7 @@ export default function ChatPage() {
     }
   }
 
+  // Voice recording functions
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -140,23 +193,20 @@ export default function ChatPage() {
         }
       })
 
-      // Try different formats for maximum compatibility
-      let mimeType = 'audio/mp4';
-      let recorder;
+      let mimeType = 'audio/mp4'
+      let recorder
 
-      // Test different formats
       if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        mimeType = 'audio/mp4';
+        mimeType = 'audio/mp4'
       } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-        mimeType = 'audio/webm;codecs=opus';
+        mimeType = 'audio/webm;codecs=opus'
       } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-        mimeType = 'audio/webm';
+        mimeType = 'audio/webm'
       }
 
       try {
         recorder = new MediaRecorder(stream, { mimeType })
       } catch (e) {
-        // Fallback to default
         recorder = new MediaRecorder(stream)
       }
 
@@ -170,6 +220,12 @@ export default function ChatPage() {
       recorder.start()
       setMediaRecorder(recorder)
       setIsRecording(true)
+      
+      // Play sound if enabled
+      if (settings.enable_sounds) {
+        soundManager.play('recording-start')
+      }
+      
       toast.success('Recording started')
     } catch (error) {
       console.error('Error starting recording:', error)
@@ -186,6 +242,12 @@ export default function ChatPage() {
       mediaRecorder.stop()
       setIsRecording(false)
       mediaRecorder.stream.getTracks().forEach(track => track.stop())
+      
+      // Play sound if enabled
+      if (settings.enable_sounds) {
+        soundManager.play('recording-stop')
+      }
+      
       toast.success('Recording stopped')
     }
   }
@@ -204,12 +266,10 @@ export default function ChatPage() {
     setLoading(true)
     try {
       const timestamp = Date.now()
-      // Use .m4a extension for iOS Safari compatibility
       const extension = audioBlob.type.includes('mp4') ? 'm4a' : 'webm'
       const fileName = `voice-${timestamp}.${extension}`
       const filePath = `${user.id}/${fileName}`
 
-      // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('voice-messages')
         .upload(filePath, audioBlob, {
@@ -218,12 +278,10 @@ export default function ChatPage() {
 
       if (uploadError) throw uploadError
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('voice-messages')
         .getPublicUrl(filePath)
 
-      // Create message with voice URL
       const { error: messageError } = await supabase
         .from('messages')
         .insert([{
@@ -235,6 +293,7 @@ export default function ChatPage() {
       if (messageError) throw messageError
       
       toast.success('Voice message sent')
+      scrollToBottom(true)
     } catch (error) {
       console.error('Error uploading voice message:', error)
       toast.error('Failed to send voice message')
@@ -243,6 +302,7 @@ export default function ChatPage() {
     }
   }
 
+  // Message bubble styling
   const getMessageStyle = (isOwnMessage: boolean) => {
     const style: React.CSSProperties = {
       borderRadius: '1rem',
@@ -277,7 +337,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
-      {/* Welcome Section - Enhanced for mobile */}
+      {/* Header Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 mt-14 md:mt-0">
         <div className="flex items-center justify-between">
           <div>
@@ -321,9 +381,13 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Messages Section */}
-      <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 mb-3 md:mb-4 overflow-y-auto pb-32">
-        <div className="space-y-3 md:space-y-4">
+      {/* Messages Container */}
+      <div 
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 overflow-y-auto relative"
+      >
+        <div className="space-y-3 md:space-y-4 mb-16">
           {messages.map((message) => (
             <div key={message.id} className="group">
               <div
@@ -378,15 +442,26 @@ export default function ChatPage() {
           ))}
           <div ref={messagesEndRef} />
         </div>
+
+        {/* New Messages Indicator */}
+        {hasNewMessages && (
+          <button
+            onClick={() => scrollToBottom(true)}
+            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-4 py-2 rounded-full text-sm shadow-lg"
+            style={{ backgroundColor: settings.primary_color }}
+          >
+            New messages ↓
+          </button>
+        )}
       </div>
 
-      {/* Message Input - Fixed at bottom */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 p-2">
+      {/* Message Input */}
+      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg p-2 md:p-3 border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-screen-lg mx-auto">
           <button
             type="button"
             onClick={toggleRecording}
-            className={`p-3 rounded-full transition-colors flex-shrink-0 ${
+            className={`p-2 md:p-3 rounded-full transition-colors flex-shrink-0 ${
               isRecording 
                 ? 'bg-red-500 animate-pulse' 
                 : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
@@ -394,9 +469,9 @@ export default function ChatPage() {
             title={isRecording ? "Click to stop recording" : "Click to start recording"}
           >
             {isRecording ? (
-              <FiSquare className="w-5 h-5 text-white" />
+              <FiSquare className="w-5 h-5 md:w-6 md:h-6 text-white" />
             ) : (
-              <FiMic className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <FiMic className="w-5 h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" />
             )}
           </button>
 
@@ -406,10 +481,8 @@ export default function ChatPage() {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1 bg-transparent text-gray-900 dark:text-white px-4 py-2 text-base focus:outline-none"
-              style={{ 
-                fontSize: '16px'
-              }}
+              className="flex-1 bg-transparent text-gray-900 dark:text-white px-4 py-2 text-base focus:outline-none min-h-[40px]"
+              style={{ fontSize: '16px' }}
               disabled={loading}
               autoComplete="off"
             />
@@ -417,11 +490,9 @@ export default function ChatPage() {
               type="submit"
               disabled={loading || !newMessage.trim()}
               className="p-2 text-white rounded-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors mx-1"
-              style={{ 
-                backgroundColor: settings.primary_color
-              }}
+              style={{ backgroundColor: settings.primary_color }}
             >
-              <FiSend className="w-5 h-5" />
+              <FiSend className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </div>
         </form>
