@@ -165,7 +165,7 @@ export default function ChatPage() {
       
       // Play sound if enabled
       if (settings.enable_sounds) {
-        soundManager.play('message-sent')
+        soundManager.play('messageSent')
       }
       
       scrollToBottom(true)
@@ -235,7 +235,7 @@ export default function ChatPage() {
       
       // Play sound if enabled
       if (settings.enable_sounds) {
-        soundManager.play('recording-start')
+        soundManager.play('recordingStart')
       }
       
       toast.success('Recording started')
@@ -257,7 +257,7 @@ export default function ChatPage() {
       
       // Play sound if enabled
       if (settings.enable_sounds) {
-        soundManager.play('recording-stop')
+        soundManager.play('recordingStop')
       }
       
       toast.success('Recording stopped')
