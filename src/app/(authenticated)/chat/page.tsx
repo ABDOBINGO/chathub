@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useAuth } from '@/lib/auth-context'
-import { useTheme } from '@/lib/theme-context'
 import { formatDistanceToNow } from 'date-fns'
 import { FiSend, FiTrash2, FiMic, FiSquare, FiRefreshCw, FiPause, FiPlay } from 'react-icons/fi'
 import toast from 'react-hot-toast'
@@ -50,7 +49,6 @@ export default function ChatPage() {
   })
 
   const { user } = useAuth()
-  const { theme } = useTheme()
   const supabase = createClientComponentClient()
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const audioChunks = useRef<Blob[]>([])

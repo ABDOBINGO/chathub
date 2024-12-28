@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { useEffect } from 'react'
-import { initAppearance } from '@/utils/appearance'
+import { initAppearance, loadAppearance } from '@/utils/appearance'
 import './globals.css'
 
 export default function RootLayout({
@@ -14,6 +14,14 @@ export default function RootLayout({
 }) {
   useEffect(() => {
     initAppearance()
+    
+    // Apply theme from saved settings
+    const savedSettings = loadAppearance()
+    if (savedSettings?.theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
   }, [])
 
   return (
