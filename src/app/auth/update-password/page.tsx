@@ -86,9 +86,10 @@ function UpdatePasswordContent() {
         <div>
           <div className="relative w-24 h-24 mx-auto mb-8">
             <Image
-              src={isFocused ? "/images/owl-hiding.png" : "/images/owl-neutral.png"}
+              src={isFocused ? "/images/owl-hiding.svg" : "/images/owl-neutral.svg"}
               alt="Owl mascot"
-              layout="fill"
+              width={96}
+              height={96}
               className="transition-transform duration-300"
               style={{ transform: isFocused ? 'scale(1.1)' : 'scale(1)' }}
             />

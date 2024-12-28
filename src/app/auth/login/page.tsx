@@ -62,13 +62,14 @@ function LoginContent() {
             <Image
               src={
                 isPasswordFocused
-                  ? "/images/owl-hiding.png"
+                  ? "/images/owl-hiding.svg"
                   : isEmailFocused
-                  ? "/images/owl-looking.png"
-                  : "/images/owl-neutral.png"
+                  ? "/images/owl-looking.svg"
+                  : "/images/owl-neutral.svg"
               }
               alt="Owl mascot"
-              layout="fill"
+              width={96}
+              height={96}
               className="transition-transform duration-300"
               style={{ transform: (isEmailFocused || isPasswordFocused) ? 'scale(1.1)' : 'scale(1)' }}
             />
