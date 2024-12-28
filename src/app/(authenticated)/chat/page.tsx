@@ -378,7 +378,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)] relative">
       {/* Header Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-3 mt-14 md:mt-0">
         <div className="flex items-center justify-between">
@@ -427,9 +427,9 @@ export default function ChatPage() {
       <div 
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 overflow-y-auto relative"
+        className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 overflow-y-auto relative mb-[80px]"
       >
-        <div className="space-y-3 md:space-y-4 mb-16">
+        <div className="space-y-3 md:space-y-4">
           {messages.map((message) => (
             <div key={message.id} className="group">
               <div
@@ -489,7 +489,7 @@ export default function ChatPage() {
         {hasNewMessages && (
           <button
             onClick={() => scrollToBottom(true)}
-            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-4 py-2 rounded-full text-sm shadow-lg"
+            className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-4 py-2 rounded-full text-sm shadow-lg"
             style={{ backgroundColor: settings.primary_color }}
           >
             New messages ↓
@@ -497,9 +497,9 @@ export default function ChatPage() {
         )}
       </div>
 
-      {/* Message Input */}
-      <div className="sticky bottom-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg p-2 md:p-3 border-t border-gray-200 dark:border-gray-700">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-screen-lg mx-auto">
+      {/* Message Input - Fixed Position */}
+      <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 p-2 md:p-3 max-w-screen-lg mx-auto">
           <button
             type="button"
             onClick={toggleRecording}
