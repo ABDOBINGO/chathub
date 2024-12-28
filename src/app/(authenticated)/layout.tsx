@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { ThemeToggle } from '../../components/theme-toggle'
 import { useAuth } from '@/lib/auth-context'
 
 export default function AuthenticatedLayout({
