@@ -7,7 +7,12 @@ import { useTheme } from '@/lib/theme-context'
 import { formatDistanceToNow } from 'date-fns'
 import { FiSend, FiTrash2, FiMic, FiSquare, FiRefreshCw, FiPause, FiPlay } from 'react-icons/fi'
 import toast from 'react-hot-toast'
-import { soundManager } from '@/lib/sounds'
+
+// Conditionally import soundManager only on client side
+let soundManager: any
+if (typeof window !== 'undefined') {
+  soundManager = require('@/lib/sounds').soundManager
+}
 
 type Profile = {
   id: string
@@ -163,8 +168,8 @@ export default function ChatPage() {
 
       if (error) throw error
       
-      // Play sound if enabled
-      if (settings.enable_sounds) {
+      // Play sound if enabled and on client side
+      if (typeof window !== 'undefined' && settings.enable_sounds && soundManager) {
         soundManager.play('messageSent')
       }
       
@@ -197,6 +202,9 @@ export default function ChatPage() {
   // Voice recording functions
   const startRecording = async () => {
     try {
+      // Check if we're on the client side
+      if (typeof window === 'undefined') return
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -233,8 +241,8 @@ export default function ChatPage() {
       setMediaRecorder(recorder)
       setIsRecording(true)
       
-      // Play sound if enabled
-      if (settings.enable_sounds) {
+      // Play sound if enabled and on client side
+      if (typeof window !== 'undefined' && settings.enable_sounds && soundManager) {
         soundManager.play('recordingStart')
       }
       
@@ -255,8 +263,8 @@ export default function ChatPage() {
       setIsRecording(false)
       mediaRecorder.stream.getTracks().forEach(track => track.stop())
       
-      // Play sound if enabled
-      if (settings.enable_sounds) {
+      // Play sound if enabled and on client side
+      if (typeof window !== 'undefined' && settings.enable_sounds && soundManager) {
         soundManager.play('recordingStop')
       }
       
