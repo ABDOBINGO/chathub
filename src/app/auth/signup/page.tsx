@@ -41,13 +41,22 @@ export default function SignUpPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email_confirmed: true
+          }
         },
       })
 
       if (error) throw error
 
-      toast.success('Check your email to confirm your account')
-      router.push('/auth/login?message=Check your email to confirm your account')
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) throw signInError
+
+      router.push('/chat')
     } catch (error: any) {
       console.error('Error signing up:', error)
       toast.error(error?.message || 'Failed to sign up')

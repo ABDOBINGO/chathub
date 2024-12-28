@@ -275,6 +275,19 @@ export default function ChatPage() {
     return style
   }
 
+  const handleAppearanceCode = (code: string) => {
+    try {
+      if (applyAppearance(code)) {
+        toast.success('Appearance settings applied successfully!')
+      } else {
+        toast.error('Invalid appearance code')
+      }
+    } catch (error) {
+      console.error('Error applying appearance:', error)
+      toast.error('Failed to apply appearance settings')
+    }
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Compact Welcome Section */}
