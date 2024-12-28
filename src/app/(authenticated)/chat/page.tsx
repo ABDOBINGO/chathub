@@ -140,7 +140,7 @@ export default function ChatPage() {
     // Auto-refresh setup
     let refreshInterval: NodeJS.Timeout | null = null
     if (autoRefresh) {
-      refreshInterval = setInterval(fetchMessages, 5000)
+      refreshInterval = setInterval(fetchMessages, 2000)
     }
 
     return () => {
@@ -159,6 +159,11 @@ export default function ChatPage() {
     setLoading(true)
 
     try {
+      // Play sound immediately for better feedback
+      if (typeof window !== 'undefined' && settings.enable_sounds && soundManager) {
+        soundManager.play('messageSent')
+      }
+
       const { error } = await supabase
         .from('messages')
         .insert([{
@@ -168,12 +173,8 @@ export default function ChatPage() {
 
       if (error) throw error
       
-      // Play sound if enabled and on client side
-      if (typeof window !== 'undefined' && settings.enable_sounds && soundManager) {
-        soundManager.play('messageSent')
-      }
-      
       scrollToBottom(true)
+      await fetchMessages()
     } catch (error) {
       console.error('Error sending message:', error)
       toast.error('Failed to send message')
