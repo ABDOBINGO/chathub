@@ -19,8 +19,10 @@ export default function ForgotPasswordPage() {
 
     setLoading(true)
     try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://chathub-knight.vercel.app'
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/auth/update-password`,
+        redirectTo: `${siteUrl}/auth/callback?next=/auth/update-password`,
       })
 
       if (error) throw error
