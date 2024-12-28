@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import toast from 'react-hot-toast'
 
 export default function UpdatePasswordPage() {
@@ -10,18 +10,36 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClientComponentClient()
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        toast.error('Invalid or expired reset link')
-        router.push('/auth/login')
+    const error = searchParams.get('error_description')
+    if (error) {
+      toast.error(error)
+      router.push('/auth/login')
+    }
+  }, [searchParams, router])
+
+  useEffect(() => {
+    const setupSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        // Get the hash fragment
+        const hash = window.location.hash
+        if (hash) {
+          // Parse the hash fragment
+          const params = new URLSearchParams(hash.substring(1))
+          const error = params.get('error_description')
+          if (error) {
+            toast.error(error)
+            router.push('/auth/login')
+          }
+        }
       }
     }
-    checkSession()
-  }, [])
+    setupSession()
+  }, [router, supabase.auth])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
