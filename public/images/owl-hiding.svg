@@ -1,0 +1,15 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <circle cx="60" cy="60" r="50" fill="#8B5CF6" />
+  
+  <!-- Eyes (closed) -->
+  <path d="M25 50 Q40 45 55 50" stroke="white" stroke-width="4" />
+  <path d="M65 50 Q80 45 95 50" stroke="white" stroke-width="4" />
+  
+  <!-- Beak -->
+  <path d="M50 70 L70 70 L60 80 Z" fill="#F59E0B" />
+  
+  <!-- Wings -->
+  <path d="M20 50 Q30 70 20 90" stroke="#7C3AED" stroke-width="8" />
+  <path d="M100 50 Q90 70 100 90" stroke="#7C3AED" stroke-width="8" />
+</svg> 
