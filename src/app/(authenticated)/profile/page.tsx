@@ -109,7 +109,7 @@ export default function ProfilePage() {
 
       // Update theme context
       await updateSettings({
-        theme: profile.theme,
+        theme: profile.theme as 'light' | 'dark',
         bubble_style: profile.bubble_style,
         primary_color: profile.primary_color,
         message_alignment: profile.message_alignment,
